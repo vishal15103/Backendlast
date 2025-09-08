@@ -1,10 +1,10 @@
-package com.backendlast.controller;
+package org.example.controller;
 
 
 
-import com.backendlast.model.User;
+import org.example.model.User;
 
-import com.backendlast.service.UserService;
+import org.example.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 
-import axios from "axios";
-
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
 
 
-function ForgotPassword() {
+
+function ForgotPasswordPage() {
 
   const [userId, setUserId] = useState("");
 
   const [newPassword, setNewPassword] = useState("");
 
-  const [message, setMessage] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const navigate = useNavigate();
 
@@ -21,6 +21,18 @@ function ForgotPassword() {
   const handleReset = async (e) => {
 
     e.preventDefault();
+
+
+
+    if (newPassword !== confirmPassword) {
+
+      alert("Passwords do not match.");
+
+      return;
+
+    }
+
+
 
     try {
 
@@ -32,13 +44,13 @@ function ForgotPassword() {
 
       });
 
-      setMessage("Password reset successful! You can login now.");
+      alert("Password reset successful! You can now login.");
 
-      setTimeout(() => navigate("/login"), 2000);
+      navigate("/");
 
     } catch (err) {
 
-      setMessage("Failed to reset password. Try again.");
+      alert("Failed to reset password.");
 
     }
 
@@ -48,17 +60,17 @@ function ForgotPassword() {
 
   return (
 
-    <div className="forgot-container">
+    <div className="forgot-password-container">
 
-      <form onSubmit={handleReset} className="forgot-form">
+      <h2>Reset Your Password</h2>
 
-        <h2>Forgot Password</h2>
+      <form onSubmit={handleReset}>
 
         <input
 
           type="text"
 
-          placeholder="User ID"
+          placeholder="Enter User ID"
 
           value={userId}
 
@@ -72,7 +84,7 @@ function ForgotPassword() {
 
           type="password"
 
-          placeholder="New Password"
+          placeholder="Enter New Password"
 
           value={newPassword}
 
@@ -82,11 +94,37 @@ function ForgotPassword() {
 
         />
 
-        <button type="submit">Reset Password</button>
+        <input
 
-        {message && <p>{message}</p>}
+          type="password"
+
+          placeholder="Confirm New Password"
+
+          value={confirmPassword}
+
+          onChange={(e) => setConfirmPassword(e.target.value)}
+
+          required
+
+        />
+
+        <button type="submit" className="reset-btn">
+
+          Reset Password
+
+        </button>
 
       </form>
+
+      <p>
+
+        <a onClick={() => navigate("/")} className="link-btn">
+
+          Back to Login
+
+        </a>
+
+      </p>
 
     </div>
 
@@ -96,4 +134,4 @@ function ForgotPassword() {
 
 
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

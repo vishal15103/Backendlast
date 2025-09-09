@@ -1,24 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 import axios from "axios";
 
-import { useNavigate } from "react-router-dom";
+import "./LoginPage.css";
+
+import "../App.css";
 
 
 
-function SignupPage() {
+function SignUpPage() {
+
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
+
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
   const [userId, setUserId] = useState("");
 
   const [password, setPassword] = useState("");
 
-  const [message, setMessage] = useState("");
-
-  const navigate = useNavigate();
 
 
+  const backgrounds = [
 
-  const handleSignup = async (e) => {
+    "/images/bg_1.jpeg",
+
+    "/images/bg2.jpeg",
+
+    "/images/bg3.jpeg",
+
+    "/images/bg_4.jpeg",
+
+  ];
+
+
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+
+      setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
+
+    }, 4000);
+
+    return () => clearInterval(interval);
+
+  }, [backgrounds.length]);
+
+
+
+  const handleSignUp = async (e) => {
 
     e.preventDefault();
 
@@ -32,13 +66,11 @@ function SignupPage() {
 
       });
 
-      setMessage("Signup successful! You can login now.");
-
-      setTimeout(() => navigate("/login"), 2000);
+      alert("Signup successful! You can login now.");
 
     } catch (err) {
 
-      setMessage("Signup failed. Try again.");
+      alert("Signup failed. Try again.");
 
     }
 
@@ -48,45 +80,121 @@ function SignupPage() {
 
   return (
 
-    <div className="signup-container">
+    <div
 
-      <form onSubmit={handleSignup} className="signup-form">
+      className="login-container"
 
-        <h2>Signup</h2>
+      style={{ backgroundImage: `url(${backgrounds[backgroundIndex]})` }}
 
-        <input
+    >
 
-          type="text"
+      <header className="header">
 
-          placeholder="User ID"
+        <div className="logo">Standard Chartered</div>
 
-          value={userId}
+      </header>
 
-          onChange={(e) => setUserId(e.target.value)}
 
-          required
 
-        />
+      <div className="main-content" style={{ justifyContent: "center" }}>
 
-        <input
+        <div className="login-box">
 
-          type="password"
+          <h2>User Sign Up</h2>
 
-          placeholder="Create Password"
+          <form onSubmit={handleSignUp}>
 
-          value={password}
+            <input
 
-          onChange={(e) => setPassword(e.target.value)}
+              type="text"
 
-          required
+              placeholder="User ID"
 
-        />
+              value={userId}
 
-        <button type="submit">Signup</button>
+              onChange={(e) => setUserId(e.target.value)}
 
-        {message && <p>{message}</p>}
+              required
 
-      </form>
+            />
+
+
+
+            <div className="password-container">
+
+              <input
+
+                type={passwordVisible ? "text" : "password"}
+
+                placeholder="New Password"
+
+                value={password}
+
+                onChange={(e) => setPassword(e.target.value)}
+
+                required
+
+              />
+
+              <span
+
+                className="toggle-password"
+
+                onClick={() => setPasswordVisible(!passwordVisible)}
+
+              >
+
+                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+
+              </span>
+
+            </div>
+
+
+
+            <div className="password-container">
+
+              <input
+
+                type={confirmPasswordVisible ? "text" : "password"}
+
+                placeholder="Confirm Password"
+
+                required
+
+              />
+
+              <span
+
+                className="toggle-password"
+
+                onClick={() =>
+
+                  setConfirmPasswordVisible(!confirmPasswordVisible)
+
+                }
+
+              >
+
+                {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
+
+              </span>
+
+            </div>
+
+
+
+            <button className="login-btn" type="submit">
+
+              Sign Up
+
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
 
     </div>
 
@@ -96,4 +204,4 @@ function SignupPage() {
 
 
 
-export default SignupPage;
+export default SignUpPage;

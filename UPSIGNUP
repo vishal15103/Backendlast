@@ -1,58 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
 import "./LoginPage.css";
 
-import "../App.css";
 
 
-
-function SignUpPage() {
-
-  const [backgroundIndex, setBackgroundIndex] = useState(0);
-
-  const [passwordVisible, setPasswordVisible] = useState(false);
-
-  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
+function SignupPage() {
 
   const [userId, setUserId] = useState("");
 
   const [password, setPassword] = useState("");
 
+  const [role, setRole] = useState("");
 
-
-  const backgrounds = [
-
-    "/images/bg_1.jpeg",
-
-    "/images/bg2.jpeg",
-
-    "/images/bg3.jpeg",
-
-    "/images/bg_4.jpeg",
-
-  ];
+  const navigate = useNavigate();
 
 
 
-  useEffect(() => {
-
-    const interval = setInterval(() => {
-
-      setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
-
-    }, 4000);
-
-    return () => clearInterval(interval);
-
-  }, [backgrounds.length]);
-
-
-
-  const handleSignUp = async (e) => {
+  const handleSignup = async (e) => {
 
     e.preventDefault();
 
@@ -64,13 +32,17 @@ function SignUpPage() {
 
         password,
 
+        role,
+
       });
 
-      alert("Signup successful! You can login now.");
+      alert("Signup successful. You can now login.");
 
-    } catch (err) {
+      navigate("/");
 
-      alert("Signup failed. Try again.");
+    } catch (error) {
+
+      alert("Signup failed. Please try again.");
 
     }
 
@@ -80,117 +52,69 @@ function SignUpPage() {
 
   return (
 
-    <div
+    <div className="login-container">
 
-      className="login-container"
+      <div className="login-box">
 
-      style={{ backgroundImage: `url(${backgrounds[backgroundIndex]})` }}
+        <h2>Signup</h2>
 
-    >
+        <form onSubmit={handleSignup}>
 
-      <header className="header">
+          <input
 
-        <div className="logo">Standard Chartered</div>
+            type="text"
 
-      </header>
+            placeholder="User ID"
 
+            value={userId}
 
+            onChange={(e) => setUserId(e.target.value)}
 
-      <div className="main-content" style={{ justifyContent: "center" }}>
+            required
 
-        <div className="login-box">
+          />
 
-          <h2>User Sign Up</h2>
+          <input
 
-          <form onSubmit={handleSignUp}>
+            type="password"
 
-            <input
+            placeholder="Password"
 
-              type="text"
+            value={password}
 
-              placeholder="User ID"
+            onChange={(e) => setPassword(e.target.value)}
 
-              value={userId}
+            required
 
-              onChange={(e) => setUserId(e.target.value)}
+          />
 
-              required
+          <select
 
-            />
+            value={role}
 
+            onChange={(e) => setRole(e.target.value)}
 
+            required
 
-            <div className="password-container">
+          >
 
-              <input
+            <option value="">Select Role</option>
 
-                type={passwordVisible ? "text" : "password"}
+            <option value="operator">Operator</option>
 
-                placeholder="New Password"
+            <option value="approver">Approver</option>
 
-                value={password}
+            <option value="user">User</option>
 
-                onChange={(e) => setPassword(e.target.value)}
+          </select>
 
-                required
+          <button type="submit">Signup</button>
 
-              />
+        </form>
 
-              <span
+        <div className="links">
 
-                className="toggle-password"
-
-                onClick={() => setPasswordVisible(!passwordVisible)}
-
-              >
-
-                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
-
-              </span>
-
-            </div>
-
-
-
-            <div className="password-container">
-
-              <input
-
-                type={confirmPasswordVisible ? "text" : "password"}
-
-                placeholder="Confirm Password"
-
-                required
-
-              />
-
-              <span
-
-                className="toggle-password"
-
-                onClick={() =>
-
-                  setConfirmPasswordVisible(!confirmPasswordVisible)
-
-                }
-
-              >
-
-                {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
-
-              </span>
-
-            </div>
-
-
-
-            <button className="login-btn" type="submit">
-
-              Sign Up
-
-            </button>
-
-          </form>
+          <p onClick={() => navigate("/")}>Back to Login</p>
 
         </div>
 
@@ -204,4 +128,4 @@ function SignUpPage() {
 
 
 
-export default SignUpPage;
+export default SignupPage;

@@ -1,22 +1,58 @@
-import React, { useState } from "react";
-
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import axios from "axios";
+
 import "./LoginPage.css";
+
+import "../App.css";
+
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 
 function LoginPage() {
 
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
+
+  const [modalContent, setModalContent] = useState(null);
+
   const [userId, setUserId] = useState("");
 
   const [password, setPassword] = useState("");
 
-  const [error, setError] = useState("");
-
   const navigate = useNavigate();
+
+
+
+  const backgrounds = [
+
+    "/images/bg_1.jpeg",
+
+    "/images/bg2.jpeg",
+
+    "/images/bg3.jpeg",
+
+    "/images/bg_4.jpeg",
+
+  ];
+
+
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+
+      setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
+
+    }, 4000);
+
+    return () => clearInterval(interval);
+
+  }, [backgrounds.length]);
 
 
 
@@ -40,23 +76,17 @@ function LoginPage() {
 
 
 
-      if (role === "operator") {
+      if (role === "operator") navigate("/operator-home");
 
-        navigate("/operator-dashboard");
+      else if (role === "approver") navigate("/approver-home");
 
-      } else if (role === "approver") {
+      else if (role === "user") navigate("/user-home");
 
-        navigate("/approver-dashboard");
-
-      } else if (role === "user") {
-
-        navigate("/user-dashboard");
-
-      }
+      else alert("Invalid role returned by server");
 
     } catch (err) {
 
-      setError("Invalid User ID or Password");
+      alert("Invalid User ID or Password");
 
     }
 
@@ -64,59 +94,209 @@ function LoginPage() {
 
 
 
+  const openModal = (type) => {
+
+    let title = "";
+
+    let desc = "";
+
+    if (type === "help") {
+
+      title = "Help";
+
+      desc = "Get quick assistance for login issues, navigation help, and common FAQs.";
+
+    } else if (type === "contact") {
+
+      title = "Contact Us";
+
+      desc = "You can reach Standard Chartered via email at support@sc.com or call 1800-123-456.";
+
+    } else if (type === "support") {
+
+      title = "Support";
+
+      desc = "Our support team is available 24/7 to resolve your banking queries.";
+
+    } else if (type === "about") {
+
+      title = "About Us";
+
+      desc = "Standard Chartered is a leading international bank, committed to driving commerce and prosperity.";
+
+    }
+
+    setModalContent({ title, desc });
+
+  };
+
+
+
   return (
 
-    <div className="login-container">
+    <div
 
-      <form onSubmit={handleLogin} className="login-form">
+      className="login-container"
 
-        <h2>Login</h2>
+      style={{ backgroundImage: `url(${backgrounds[backgroundIndex]})` }}
 
-        <input
+    >
 
-          type="text"
+      <header className="header">
 
-          placeholder="User ID"
+        <div className="logo">Standard Chartered</div>
 
-          value={userId}
+        <nav>
 
-          onChange={(e) => setUserId(e.target.value)}
+          <a onClick={() => openModal("help")}>Help</a>
 
-          required
+          <a onClick={() => openModal("contact")}>Contact Us</a>
 
-        />
+          <a onClick={() => openModal("support")}>Support</a>
 
-        <input
+          <a onClick={() => openModal("about")}>About Us</a>
 
-          type="password"
+        </nav>
 
-          placeholder="Password"
+      </header>
 
-          value={password}
 
-          onChange={(e) => setPassword(e.target.value)}
 
-          required
+      <div className="main-content">
 
-        />
+        <div className="welcome-section">
 
-        <button type="submit">Login</button>
+          <h1>Welcome to Standard Chartered</h1>
 
-        {error && <p className="error">{error}</p>}
+          <p>
 
-        <p onClick={() => navigate("/forgot-password")} className="link">
+            We are committed to delivering exceptional banking services with
 
-          Forgot Password?
+            integrity, innovation, and inclusivity.
 
-        </p>
+          </p>
 
-        <p onClick={() => navigate("/signup")} className="link">
+        </div>
 
-          New User? Signup
 
-        </p>
 
-      </form>
+        <div className="login-box">
+
+          <h2>User Login</h2>
+
+          <form onSubmit={handleLogin}>
+
+            <input
+
+              type="text"
+
+              placeholder="Enter User ID"
+
+              value={userId}
+
+              onChange={(e) => setUserId(e.target.value)}
+
+              required
+
+            />
+
+
+
+            <div className="password-container">
+
+              <input
+
+                type={passwordVisible ? "text" : "password"}
+
+                placeholder="Password"
+
+                value={password}
+
+                onChange={(e) => setPassword(e.target.value)}
+
+                required
+
+              />
+
+              <span
+
+                className="toggle-password"
+
+                onClick={() => setPasswordVisible(!passwordVisible)}
+
+              >
+
+                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+
+              </span>
+
+            </div>
+
+
+
+            <button className="login-btn" type="submit">
+
+              Login
+
+            </button>
+
+          </form>
+
+
+
+          <div className="extra-links">
+
+            <p>
+
+              <a onClick={() => navigate("/signup")} className="link-btn">
+
+                Sign Up (User Only)
+
+              </a>
+
+            </p>
+
+            <p>
+
+              <a
+
+                onClick={() => navigate("/forgot-password")}
+
+                className="link-btn"
+
+              >
+
+                Forgot Password?
+
+              </a>
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      {modalContent && (
+
+        <div className="modal-overlay">
+
+          <div className="modal">
+
+            <h2>{modalContent.title}</h2>
+
+            <p>{modalContent.desc}</p>
+
+            <button onClick={() => setModalContent(null)}>Close</button>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
 

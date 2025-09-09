@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 
-import axios from "axios";
-
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+
+import { useNavigate } from "react-router-dom";
 
 import "./LoginPage.css";
 
@@ -20,8 +20,6 @@ function SignUpPage() {
 
   const [modalContent, setModalContent] = useState(null);
 
-
-
   const [userId, setUserId] = useState("");
 
   const [username, setUsername] = useState("");
@@ -29,6 +27,8 @@ function SignUpPage() {
   const [password, setPassword] = useState("");
 
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const navigate = useNavigate();
 
 
 
@@ -64,31 +64,59 @@ function SignUpPage() {
 
     e.preventDefault();
 
-    if (password !== confirmPassword) {
 
-      alert("Passwords do not match!");
+
+    if (!userId || !username || !password || !confirmPassword) {
+
+      alert("Please fill all fields.");
 
       return;
 
     }
 
+
+
+    if (password !== confirmPassword) {
+
+      alert("Passwords do not match.");
+
+      return;
+
+    }
+
+
+
     try {
 
-      await axios.post("http://localhost:8080/api/auth/signup", {
+      const response = await fetch("http://localhost:8080/api/signup", {
 
-        userId,
+        method: "POST",
 
-        username,
+        headers: { "Content-Type": "application/json" },
 
-        password,
+        body: JSON.stringify({ userId, username, password }),
 
       });
 
+
+
+      if (!response.ok) {
+
+        const err = await response.text();
+
+        throw new Error(err || "Sign Up failed");
+
+      }
+
+
+
       alert("User account created successfully!");
+
+      navigate("/"); // redirect to login page
 
     } catch (error) {
 
-      alert("Signup failed: " + (error.response?.data?.message || "Server error"));
+      alert("Sign Up failed: " + error.message);
 
     }
 
@@ -98,9 +126,7 @@ function SignUpPage() {
 
   const openModal = (type) => {
 
-    let title = "";
-
-    let desc = "";
+    let title = "", desc = "";
 
     switch (type) {
 
@@ -132,7 +158,7 @@ function SignUpPage() {
 
         title = "About Us";
 
-        desc = "Standard Chartered is a leading international bank.";
+        desc = "Standard Chartered is a leading international bank, committed to driving commerce and prosperity through our unique diversity.";
 
         break;
 
@@ -184,7 +210,41 @@ function SignUpPage() {
 
           <h1>Create Your Account</h1>
 
-          <p>Join Standard Chartered to experience secure, global, and reliable banking.</p>
+          <p>
+
+            Join Standard Chartered to experience secure, global, and reliable banking.
+
+          </p>
+
+
+
+          <div className="mottos">
+
+            <div className="motto-card">
+
+              <img src="/icons/secure.png" alt="Secure" /> Secure Transactions
+
+            </div>
+
+            <div className="motto-card">
+
+              <img src="/icons/global.png" alt="Global" /> Global Access
+
+            </div>
+
+            <div className="motto-card">
+
+              <img src="/icons/fast.png" alt="Fast" /> Fast & Reliable
+
+            </div>
+
+            <div className="motto-card">
+
+              <img src="/icons/trust.png" alt="Trust" /> Trusted Banking Partner
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -196,9 +256,33 @@ function SignUpPage() {
 
           <form onSubmit={handleSignUp}>
 
-            <input type="text" placeholder="User ID" value={userId} onChange={(e) => setUserId(e.target.value)} required />
+            <input
 
-            <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+              type="text"
+
+              placeholder="User ID"
+
+              value={userId}
+
+              onChange={(e) => setUserId(e.target.value)}
+
+              required
+
+            />
+
+            <input
+
+              type="text"
+
+              placeholder="Username"
+
+              value={username}
+
+              onChange={(e) => setUsername(e.target.value)}
+
+              required
+
+            />
 
 
 
@@ -218,7 +302,13 @@ function SignUpPage() {
 
               />
 
-              <span onClick={() => setPasswordVisible(!passwordVisible)}>
+              <span
+
+                className="toggle-password"
+
+                onClick={() => setPasswordVisible(!passwordVisible)}
+
+              >
 
                 {passwordVisible ? <FaEyeSlash /> : <FaEye />}
 
@@ -244,7 +334,13 @@ function SignUpPage() {
 
               />
 
-              <span onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}>
+              <span
+
+                className="toggle-password"
+
+                onClick={() => setConfirmPasswordVisible(!confirmPasswordVisible)}
+
+              >
 
                 {confirmPasswordVisible ? <FaEyeSlash /> : <FaEye />}
 
@@ -254,7 +350,11 @@ function SignUpPage() {
 
 
 
-            <button className="login-btn" type="submit">Sign Up</button>
+            <button className="login-btn" type="submit">
+
+              Sign Up
+
+            </button>
 
           </form>
 
@@ -291,3 +391,4 @@ function SignUpPage() {
 
 
 export default SignUpPage;
+

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 
@@ -6,25 +6,69 @@ import axios from "axios";
 
 import "./LoginPage.css";
 
+import "../App.css";
 
 
-function ForgotPassword() {
+
+function ForgotPasswordPage() {
+
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
 
   const [userId, setUserId] = useState("");
 
   const [newPassword, setNewPassword] = useState("");
 
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [modalContent, setModalContent] = useState(null);
+
   const navigate = useNavigate();
 
 
 
-  const handleForgotPassword = async (e) => {
+  const backgrounds = [
+
+    "/images/bg_1.jpeg",
+
+    "/images/bg2.jpeg",
+
+    "/images/bg3.jpeg",
+
+    "/images/bg_4.jpeg",
+
+  ];
+
+
+
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+
+      setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
+
+    }, 4000);
+
+    return () => clearInterval(interval);
+
+  }, [backgrounds.length]);
+
+
+
+  const handleReset = async (e) => {
 
     e.preventDefault();
 
+    if (newPassword !== confirmPassword) {
+
+      alert("Passwords do not match.");
+
+      return;
+
+    }
+
     try {
 
-      await axios.post("http://localhost:8080/api/auth/forgot-password", {
+      await axios.post("http://localhost:8080/api/auth/reset-password", {
 
         userId,
 
@@ -32,13 +76,13 @@ function ForgotPassword() {
 
       });
 
-      alert("Password reset successfully. Please login.");
+      alert("Password reset successful! You can now log in.");
 
       navigate("/");
 
     } catch (error) {
 
-      alert("Failed to reset password. Try again.");
+      alert("Reset failed: " + (error.response?.data?.message || "Server error"));
 
     }
 
@@ -46,55 +90,181 @@ function ForgotPassword() {
 
 
 
+  const openModal = (type) => {
+
+    let title = "";
+
+    let desc = "";
+
+    switch (type) {
+
+      case "help":
+
+        title = "Help";
+
+        desc = "Get quick assistance for login issues, navigation help, and common FAQs.";
+
+        break;
+
+      case "contact":
+
+        title = "Contact Us";
+
+        desc = "You can reach Standard Chartered via email at support@sc.com or call 1800-123-456.";
+
+        break;
+
+      case "support":
+
+        title = "Support";
+
+        desc = "Our support team is available 24/7 to resolve your banking queries and provide assistance.";
+
+        break;
+
+      case "about":
+
+        title = "About Us";
+
+        desc = "Standard Chartered is a leading international bank.";
+
+        break;
+
+      default:
+
+        break;
+
+    }
+
+    setModalContent({ title, desc });
+
+  };
+
+
+
   return (
 
-    <div className="login-container">
+    <div
 
-      <div className="login-box">
+      className="login-container"
 
-        <h2>Forgot Password</h2>
+      style={{ backgroundImage: `url(${backgrounds[backgroundIndex]})` }}
 
-        <form onSubmit={handleForgotPassword}>
+    >
 
-          <input
+      <header className="header">
 
-            type="text"
+        <div className="logo">Standard Chartered</div>
 
-            placeholder="User ID"
+        <nav>
 
-            value={userId}
+          <a onClick={() => openModal("help")}>Help</a>
 
-            onChange={(e) => setUserId(e.target.value)}
+          <a onClick={() => openModal("contact")}>Contact Us</a>
 
-            required
+          <a onClick={() => openModal("support")}>Support</a>
 
-          />
+          <a onClick={() => openModal("about")}>About Us</a>
 
-          <input
+        </nav>
 
-            type="password"
+      </header>
 
-            placeholder="New Password"
 
-            value={newPassword}
 
-            onChange={(e) => setNewPassword(e.target.value)}
+      <div className="main-content" style={{ justifyContent: "center" }}>
 
-            required
+        <div className="welcome-section">
 
-          />
+          <h1>Reset Your Password</h1>
 
-          <button type="submit">Reset Password</button>
+          <p>Enter your User ID and create a new password.</p>
 
-        </form>
+        </div>
 
-        <div className="links">
 
-          <p onClick={() => navigate("/")}>Back to Login</p>
+
+        <div className="login-box">
+
+          <h2>Forgot Password</h2>
+
+          <form onSubmit={handleReset}>
+
+            <input
+
+              type="text"
+
+              placeholder="Enter User ID"
+
+              value={userId}
+
+              onChange={(e) => setUserId(e.target.value)}
+
+              required
+
+            />
+
+            <input
+
+              type="password"
+
+              placeholder="Enter New Password"
+
+              value={newPassword}
+
+              onChange={(e) => setNewPassword(e.target.value)}
+
+              required
+
+            />
+
+            <input
+
+              type="password"
+
+              placeholder="Confirm New Password"
+
+              value={confirmPassword}
+
+              onChange={(e) => setConfirmPassword(e.target.value)}
+
+              required
+
+            />
+
+            <button type="submit" className="login-btn">Reset Password</button>
+
+          </form>
+
+          <p>
+
+            <a onClick={() => navigate("/")} className="link-btn">Back to Login</a>
+
+          </p>
 
         </div>
 
       </div>
+
+
+
+      {modalContent && (
+
+        <div className="modal-overlay">
+
+          <div className="modal">
+
+            <h2>{modalContent.title}</h2>
+
+            <p>{modalContent.desc}</p>
+
+            <button onClick={() => setModalContent(null)}>Close</button>
+
+          </div>
+
+        </div>
+
+      )}
 
     </div>
 
@@ -104,4 +274,4 @@ function ForgotPassword() {
 
 
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import axios from "axios";
-
 import "./LoginPage.css";
 
 import "../App.css";
@@ -60,31 +58,57 @@ function LoginPage() {
 
     e.preventDefault();
 
+    if (!userId || !password) {
+
+      alert("Please enter both User ID and Password.");
+
+      return;
+
+    }
+
+
+
     try {
 
-      const response = await axios.post("http://localhost:8080/api/auth/login", {
+      const response = await fetch("http://localhost:8080/api/login", {
 
-        userId,
+        method: "POST",
 
-        password,
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify({ userId, password }),
 
       });
 
-      const role = response.data.role;
+
+
+      if (!response.ok) {
+
+        const err = await response.text();
+
+        throw new Error(err || "Login failed");
+
+      }
 
 
 
-      if (role === "operator") navigate("/operator-home");
+      const data = await response.json();
 
-      else if (role === "approver") navigate("/approver-home");
 
-      else if (role === "user") navigate("/user-home");
 
-      else alert("Invalid role. Please check credentials.");
+      // Redirect based on role
+
+      if (data.role === "OPERATOR") navigate("/operator-home");
+
+      else if (data.role === "APPROVER") navigate("/approver-home");
+
+      else if (data.role === "USER") navigate("/user-home");
+
+      else alert("Invalid role returned from server");
 
     } catch (error) {
 
-      alert("Login failed: " + (error.response?.data?.message || "Server error"));
+      alert("Login failed: " + error.message);
 
     }
 
@@ -94,11 +118,7 @@ function LoginPage() {
 
   const openModal = (type) => {
 
-    let title = "";
-
-    let desc = "";
-
-
+    let title = "", desc = "";
 
     switch (type) {
 
@@ -139,8 +159,6 @@ function LoginPage() {
         break;
 
     }
-
-
 
     setModalContent({ title, desc });
 
@@ -186,9 +204,9 @@ function LoginPage() {
 
           <p>
 
-            We are committed to delivering exceptional banking services with integrity,
+            We are committed to delivering exceptional banking services with
 
-            innovation, and inclusivity.
+            integrity, innovation, and inclusivity.
 
           </p>
 
@@ -280,7 +298,11 @@ function LoginPage() {
 
 
 
-            <button className="login-btn" type="submit">Login</button>
+            <button className="login-btn" type="submit">
+
+              Login
+
+            </button>
 
           </form>
 
@@ -300,7 +322,13 @@ function LoginPage() {
 
             <p>
 
-              <a onClick={() => navigate("/forgot-password")} className="link-btn">
+              <a
+
+                onClick={() => navigate("/forgot-password")}
+
+                className="link-btn"
+
+              >
 
                 Forgot Password?
 

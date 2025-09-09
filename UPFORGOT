@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
-
-import axios from "axios";
 
 import "./LoginPage.css";
 
@@ -12,51 +10,31 @@ import "../App.css";
 
 function ForgotPasswordPage() {
 
-  const [backgroundIndex, setBackgroundIndex] = useState(0);
-
   const [userId, setUserId] = useState("");
 
   const [newPassword, setNewPassword] = useState("");
 
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [modalContent, setModalContent] = useState(null);
-
   const navigate = useNavigate();
-
-
-
-  const backgrounds = [
-
-    "/images/bg_1.jpeg",
-
-    "/images/bg2.jpeg",
-
-    "/images/bg3.jpeg",
-
-    "/images/bg_4.jpeg",
-
-  ];
-
-
-
-  useEffect(() => {
-
-    const interval = setInterval(() => {
-
-      setBackgroundIndex((prev) => (prev + 1) % backgrounds.length);
-
-    }, 4000);
-
-    return () => clearInterval(interval);
-
-  }, [backgrounds.length]);
 
 
 
   const handleReset = async (e) => {
 
     e.preventDefault();
+
+
+
+    if (!userId || !newPassword || !confirmPassword) {
+
+      alert("Please fill all fields.");
+
+      return;
+
+    }
+
+
 
     if (newPassword !== confirmPassword) {
 
@@ -66,77 +44,41 @@ function ForgotPasswordPage() {
 
     }
 
+
+
     try {
 
-      await axios.post("http://localhost:8080/api/auth/reset-password", {
+      const response = await fetch("http://localhost:8080/api/forgot-password", {
 
-        userId,
+        method: "PUT",
 
-        newPassword,
+        headers: { "Content-Type": "application/json" },
+
+        body: JSON.stringify({ userId, newPassword }),
 
       });
 
-      alert("Password reset successful! You can now log in.");
 
-      navigate("/");
+
+      if (!response.ok) {
+
+        const err = await response.text();
+
+        throw new Error(err || "Reset failed");
+
+      }
+
+
+
+      alert("Password reset successful! You can now log in with your new password.");
+
+      navigate("/"); // redirect to login
 
     } catch (error) {
 
-      alert("Reset failed: " + (error.response?.data?.message || "Server error"));
+      alert("Reset failed: " + error.message);
 
     }
-
-  };
-
-
-
-  const openModal = (type) => {
-
-    let title = "";
-
-    let desc = "";
-
-    switch (type) {
-
-      case "help":
-
-        title = "Help";
-
-        desc = "Get quick assistance for login issues, navigation help, and common FAQs.";
-
-        break;
-
-      case "contact":
-
-        title = "Contact Us";
-
-        desc = "You can reach Standard Chartered via email at support@sc.com or call 1800-123-456.";
-
-        break;
-
-      case "support":
-
-        title = "Support";
-
-        desc = "Our support team is available 24/7 to resolve your banking queries and provide assistance.";
-
-        break;
-
-      case "about":
-
-        title = "About Us";
-
-        desc = "Standard Chartered is a leading international bank.";
-
-        break;
-
-      default:
-
-        break;
-
-    }
-
-    setModalContent({ title, desc });
 
   };
 
@@ -148,45 +90,15 @@ function ForgotPasswordPage() {
 
       className="login-container"
 
-      style={{ backgroundImage: `url(${backgrounds[backgroundIndex]})` }}
+      style={{ backgroundImage: `url(/images/bg_1.jpeg)` }}
 
     >
 
-      <header className="header">
-
-        <div className="logo">Standard Chartered</div>
-
-        <nav>
-
-          <a onClick={() => openModal("help")}>Help</a>
-
-          <a onClick={() => openModal("contact")}>Contact Us</a>
-
-          <a onClick={() => openModal("support")}>Support</a>
-
-          <a onClick={() => openModal("about")}>About Us</a>
-
-        </nav>
-
-      </header>
-
-
-
       <div className="main-content" style={{ justifyContent: "center" }}>
-
-        <div className="welcome-section">
-
-          <h1>Reset Your Password</h1>
-
-          <p>Enter your User ID and create a new password.</p>
-
-        </div>
-
-
 
         <div className="login-box">
 
-          <h2>Forgot Password</h2>
+          <h2>Reset Your Password</h2>
 
           <form onSubmit={handleReset}>
 
@@ -232,39 +144,27 @@ function ForgotPasswordPage() {
 
             />
 
-            <button type="submit" className="login-btn">Reset Password</button>
+            <button type="submit" className="login-btn">
+
+              Reset Password
+
+            </button>
 
           </form>
 
           <p>
 
-            <a onClick={() => navigate("/")} className="link-btn">Back to Login</a>
+            <a onClick={() => navigate("/")} className="link-btn">
+
+              Back to Login
+
+            </a>
 
           </p>
 
         </div>
 
       </div>
-
-
-
-      {modalContent && (
-
-        <div className="modal-overlay">
-
-          <div className="modal">
-
-            <h2>{modalContent.title}</h2>
-
-            <p>{modalContent.desc}</p>
-
-            <button onClick={() => setModalContent(null)}>Close</button>
-
-          </div>
-
-        </div>
-
-      )}
 
     </div>
 
